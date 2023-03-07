@@ -1,0 +1,4 @@
+scraper_env/
+__pycache__/
+test.py
+scraping_info.py
