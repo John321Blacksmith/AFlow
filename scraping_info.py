@@ -7,6 +7,6 @@ books = {
 		'link': {'tag': 'a', 'attribute': 'src'},
 		'image': {'tag': 'img', 'attribute': 'src'},
 		'obj_components': ['titles', 'integers', 'links', 'images'],
-		'pages_amount': 50
+		'pages_amount': 1
 	}
 }

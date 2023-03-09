@@ -1,19 +1,20 @@
 """
-This module contains the functionality to format the scraped data to .csv format
-and dump it to the Excel tables.
+This module contains the functionality to format the scraped data to the Excel tables.
 """
-from openpyxl import Workbook
-
-# define a workbook
-wb = Workbook()
-
-# define a sheet
-sheet = wb.active
-
-# write the content to the columns A and B
-sheet['A1'] = 'hello'
-sheet['B1'] = 'world'
+import openpyxl
+import pandas as pd
 
 
-if __name__ == '__main__':
-	wb.save(filename='hello_world.xlsx')
+def write_objs_to_excel(file_name, list_of_objs: list):
+	"""
+	This function takes a list of structured objects
+	and records them to the dedicated excel table.
+	"""
+
+	# define a dataframe
+	df = pd.DataFrame(data=list_of_objs, columns=['title', 'integer', 'link', 'image'])
+
+	# perform writing to the excel file
+	df.to_excel(file_name, sheet_name='all_books', index=False, engine='openpyxl')
+
+	print('done')

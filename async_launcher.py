@@ -6,6 +6,7 @@ process of asynchronous web scraping.
 """
 import asyncio
 import aiohttp
+import test
 from data_miner import DataFetcher as Df
 from scraping_info import books
 
@@ -65,12 +66,12 @@ if __name__ == '__main__':
 	# scrape the data in each task
 	scraper = Df(results, 'books-to-scrape', books)
 
+	# get unstructured content
 	content = scraper.fetch_content()
 
+	# get a list of structured objects
 	books_list = scraper.structure_data(content)
 
-	for book in books_list:
-		for key, value in book.items():
-			print(key + ':::' + str(value))
-	else:
-		print('\n\n')
+	# print(books_list)
+	# # dump all the objects to the excel table
+	test.write_objs_to_excel('tables//books.xlsx', list_of_objs=books_list)
