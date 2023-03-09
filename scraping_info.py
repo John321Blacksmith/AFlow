@@ -6,7 +6,7 @@ books = {
 		'integer': {'tag': 'p', 'class': 'price_color'},
 		'link': {'tag': 'a', 'attribute': 'src'},
 		'image': {'tag': 'img', 'attribute': 'src'},
-		'obj_components': ['titles', 'integers', 'links', 'images'],
-		'pages_amount': 1
+		'generic_quantity': {'tag': '', 'class': ''},
+		'obj_components': ['titles', 'integers', 'links', 'images']
 	}
 }

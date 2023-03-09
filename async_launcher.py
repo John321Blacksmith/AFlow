@@ -58,6 +58,13 @@ async def main():
 		return data
 
 
+async def find_pages_amount(site_dict: dict):
+	"""
+	This async function invokes a parser method that finds an amount 
+	of pages and so defines a quantity of tasks to be performed.
+	"""
+
+
 if __name__ == '__main__':
 
 	# get the responses as tasks

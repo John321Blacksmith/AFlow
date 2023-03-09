@@ -10,6 +10,39 @@ class DataFetcher:
       self.site_dict = site_dict
       self.item = item
 
+   @staticmethod
+   def get_pages_amount(response, item, site_dict: dict):
+      """
+      This method goes to the first page of the category, finds a total
+      amount of objects, counts an amount of ones which are gotten per one 
+      page and returns a calculated pages amount.
+      """
+
+      # derive a soup object
+      soup = Bs(response, 'html.parser')
+      
+      # find objects of the single start page
+      objects = soup.find_all(site_dict[item]['object']['tag'],
+                              site_dict[item]['object']['class'])
+
+      # define a number of objects per page
+      objs_per_page = len(objects)
+
+      # define a total amount of objects
+      total_objs_amount = soup.find(site_dict[item]['generic_quantity']['tag'],
+                                    site_dict[item]['generic_quantity']['class'])
+
+      # find how many full pages there will be
+      full_pages_amount = total_objs_amount // total_objs_amount
+
+      # check if there are exessive objects
+      if full_pages_amount < (total_objs_amount / objs_per_page):
+         full_pages_amount += 1
+
+
+      return full_pages_amount
+
+
    def structure_data(self, content):
       """
       This method receives unstructured content of
