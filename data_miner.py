@@ -29,11 +29,19 @@ class DataFetcher:
       objs_per_page = len(objects)
 
       # define a total amount of objects
-      total_objs_amount = soup.find(site_dict[item]['generic_quantity']['tag'],
-                                    site_dict[item]['generic_quantity']['class'])
+      if 'inlined_tag' in site_dict[item]['generic_quantity'].keys():
+         inlined_tag = site_dict[item]['generic_quantity']['inlined_tag']
+         total_objs_amount = soup.find(site_dict[item]['generic_quantity']['tag'],
+                                       site_dict[item]['generic_quantity']['class']).inlined_tag.text
+      else:
+         total_objs_amount = soup.find(site_dict[item]['generic_quantity']['tag'],
+                                       site_dict[item]['generic_quantity']['class']).text
+         
+      # convert to integer
+      total_objs_amount = DataFetcher.refine_string(total_objs_amount)
 
       # find how many full pages there will be
-      full_pages_amount = total_objs_amount // total_objs_amount
+      full_pages_amount = total_objs_amount // objs_per_page
 
       # check if there are exessive objects
       if full_pages_amount < (total_objs_amount / objs_per_page):
@@ -86,6 +94,17 @@ class DataFetcher:
                return i
             else:
                continue
+
+   @staticmethod
+   def refine_string(pr_string):
+      data = ''
+      for letter in list(pr_string):
+         if letter.is_digit():
+            data += letter
+      else:
+         data = int(data)
+
+      return data
 
    @staticmethod
    def retrieve_objects(soup, item, content_dict, site_dict: dict):

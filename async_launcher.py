@@ -29,7 +29,7 @@ async def collect_tasks_from_each_page(session):
 	tasks = []
 
 	# define a number of pages to be processed
-	num_of_pages = books['books-to-scrape']['pages_amount']
+	num_of_pages = await find_pages_amount(session)
 
 	# wade through the urls list
 	for i in range(0, num_of_pages):
@@ -58,11 +58,21 @@ async def main():
 		return data
 
 
-async def find_pages_amount(site_dict: dict):
+async def find_pages_amount(session):
 	"""
 	This async function invokes a parser method that finds an amount 
 	of pages and so defines a quantity of tasks to be performed.
 	"""
+
+	# get a single response
+	response = await get_page(session, books['books-to-scrape']['source'].format(1))
+
+	# utilize a parser
+	amount = DataFetcher.get_pages_amount(response,'books-to-scrape', books)
+
+	return amount
+
+
 
 
 if __name__ == '__main__':
@@ -70,15 +80,16 @@ if __name__ == '__main__':
 	# get the responses as tasks
 	results = asyncio.run(main())
 
+
 	# scrape the data in each task
-	scraper = Df(results, 'books-to-scrape', books)
+	# scraper = Df(results, 'books-to-scrape', books)
 
 	# get unstructured content
-	content = scraper.fetch_content()
+	# content = scraper.fetch_content()
 
 	# get a list of structured objects
-	books_list = scraper.structure_data(content)
+	# books_list = scraper.structure_data(content)
 
 	# print(books_list)
 	# # dump all the objects to the excel table
-	test.write_objs_to_excel('tables//books.xlsx', list_of_objs=books_list)
+	# test.write_objs_to_excel('tables//books.xlsx', list_of_objs=books_list)

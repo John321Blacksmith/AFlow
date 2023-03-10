@@ -6,7 +6,7 @@ books = {
 		'integer': {'tag': 'p', 'class': 'price_color'},
 		'link': {'tag': 'a', 'attribute': 'src'},
 		'image': {'tag': 'img', 'attribute': 'src'},
-		'generic_quantity': {'tag': '', 'class': ''},
+		'generic_quantity': {'tag': 'form', 'class': 'form-horizontal', 'inlined_tag': 'strong'},
 		'obj_components': ['titles', 'integers', 'links', 'images']
 	}
 }
