@@ -32,7 +32,7 @@ class DataFetcher:
       if 'inlined_tag' in site_dict[item]['generic_quantity'].keys():
          inlined_tag = site_dict[item]['generic_quantity']['inlined_tag']
          total_objs_amount = soup.find(site_dict[item]['generic_quantity']['tag'],
-                                       site_dict[item]['generic_quantity']['class']).inlined_tag.text
+                                       site_dict[item]['generic_quantity']['class']).__getattr__(inlined_tag).text
       else:
          total_objs_amount = soup.find(site_dict[item]['generic_quantity']['tag'],
                                        site_dict[item]['generic_quantity']['class']).text
@@ -99,7 +99,7 @@ class DataFetcher:
    def refine_string(pr_string):
       data = ''
       for letter in list(pr_string):
-         if letter.is_digit():
+         if letter.isdigit():
             data += letter
       else:
          data = int(data)

@@ -30,8 +30,8 @@ async def collect_tasks_from_each_page(session):
 
 	# define a number of pages to be processed
 	num_of_pages = await find_pages_amount(session)
-
-	# wade through the urls list
+	
+	# # wade through the urls list
 	for i in range(0, num_of_pages):
 		# get the task
 		n = i + 1
@@ -79,6 +79,7 @@ if __name__ == '__main__':
 
 	# get the responses as tasks
 	results = asyncio.run(main())
+
 
 
 	# scrape the data in each task
