@@ -29,13 +29,20 @@ class DataFetcher:
       objs_per_page = len(objects)
 
       # define a total amount of objects
-      if 'inlined_tag' in site_dict[item]['generic_quantity'].keys():
-         inlined_tag = site_dict[item]['generic_quantity']['inlined_tag']
-         total_objs_amount = soup.find(site_dict[item]['generic_quantity']['tag'],
-                                       site_dict[item]['generic_quantity']['class']).__getattr__(inlined_tag).text
+
+      # if the amount data is represented as an object, it'll be treated as a dict
+      if isinstance(site_dict[item]['generic_quantity'], dict):
+         if 'inlined_tag' in site_dict[item]['generic_quantity'].keys():
+            inlined_tag = site_dict[item]['generic_quantity']['inlined_tag']
+            total_objs_amount = soup.find(site_dict[item]['generic_quantity']['tag'],
+                                          site_dict[item]['generic_quantity']['class']).__getattr__(inlined_tag).text
+         else:
+            total_objs_amount = soup.find(site_dict[item]['generic_quantity']['tag'],
+                                          site_dict[item]['generic_quantity']['class']).text
+         
+      # if as a string or smth else:
       else:
-         total_objs_amount = soup.find(site_dict[item]['generic_quantity']['tag'],
-                                       site_dict[item]['generic_quantity']['class']).text
+         total_objs_amount = site_dict[item]['generic_quantity']
          
       # convert to integer
       total_objs_amount = DataFetcher.refine_string(total_objs_amount)

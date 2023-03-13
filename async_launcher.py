@@ -1,6 +1,6 @@
 """
 This testual module adheres the asynchronous conception.
-There are three functions which do a whole
+There are five functions which do a whole
 process of asynchronous web scraping.
 
 """
@@ -35,8 +35,8 @@ async def collect_tasks_from_each_page(session):
 	for i in range(0, num_of_pages):
 		# get the task
 		n = i + 1
-		task = asyncio.create_task(get_response(session, books['russian-books']['source'].format(n)))
-		print(books['russian-books']['source'].format(n))
+		task = asyncio.create_task(get_response(session, books['litres-books']['source'].format(n)))
+		print(books['litres-books']['source'].format(n))
 		tasks.append(task)
 
 	# gather all the tasks in one object corountine
@@ -52,10 +52,10 @@ async def find_pages_amount(session):
 	"""
 
 	# get a single response
-	response = await get_response(session, books['russian-books']['source'].format(1))
+	response = await get_response(session, books['litres-books']['source'].format(1))
 
 	# utilize a parser
-	amount = Df.get_pages_amount(response,'russian-books', books)
+	amount = Df.get_pages_amount(response,'litres-books', books)
 
 	return amount
 
@@ -84,7 +84,7 @@ async def main():
 	results = await begin_session()
 
 	# define a parsing object
-	scraper = Df(results, 'russian-books', books)
+	scraper = Df(results, 'litres-books', books)
 
 	# get unstructured data from each task
 	content = scraper.fetch_content()
@@ -93,7 +93,7 @@ async def main():
 	books_list = scraper.structure_data(content)
 
 	# write the gotten objects to the excel sheet
-	data_manager.write_objs_to_excel('tables//russian-books.xlsx', list_of_objs=books_list)
+	data_manager.write_objs_to_excel('tables//litres-books.xlsx', list_of_objs=books_list)
 
 
 if __name__ == '__main__':
