@@ -16,7 +16,14 @@ async def get_response(session, url):
 	This function fetches the response data from the current page.
 	"""
 	async with session.get(url) as response:
-		return await response.text()
+
+		# html data of the response
+		html = await response.text()
+
+		# status code of the response
+		status = response.status
+
+		return {'html': html, 'status': status}
 
 
 async def collect_tasks_from_each_page(session):
@@ -35,9 +42,11 @@ async def collect_tasks_from_each_page(session):
 	for i in range(0, num_of_pages):
 		# get the task
 		n = i + 1
-		task = asyncio.create_task(get_response(session, books['litres-books']['source'].format(n)))
-		print(books['litres-books']['source'].format(n))
-		tasks.append(task)
+		response = await get_response(session, books['ali-books']['source'].format(n))
+		if response['status'] == 200:
+			print(n)
+			task = asyncio.create_task(response)
+			tasks.append(task)
 
 	# gather all the tasks in one object corountine
 	result = await asyncio.gather(*tasks)
@@ -50,12 +59,13 @@ async def find_pages_amount(session):
 	This async function invokes a parser method that finds an amount 
 	of pages and so defines a quantity of tasks to be performed.
 	"""
+	amount = None
 
 	# get a single response
-	response = await get_response(session, books['litres-books']['source'].format(1))
-
-	# utilize a parser
-	amount = Df.get_pages_amount(response,'litres-books', books)
+	response = await get_response(session, books['ali-books']['source'].format(1))
+	if response['status'] == 200:
+		# utilize a parser
+		amount = Df.get_pages_amount(response,'ali-books', books)
 
 	return amount
 
@@ -84,7 +94,7 @@ async def main():
 	results = await begin_session()
 
 	# define a parsing object
-	scraper = Df(results, 'litres-books', books)
+	scraper = Df(results, 'ali-books', books)
 
 	# get unstructured data from each task
 	content = scraper.fetch_content()
@@ -93,7 +103,7 @@ async def main():
 	books_list = scraper.structure_data(content)
 
 	# write the gotten objects to the excel sheet
-	data_manager.write_objs_to_excel('tables//litres-books.xlsx', list_of_objs=books_list)
+	data_manager.write_objs_to_excel('tables//ali-books.xlsx', list_of_objs=books_list)
 
 
 if __name__ == '__main__':

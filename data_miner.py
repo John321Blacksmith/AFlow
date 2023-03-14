@@ -43,19 +43,21 @@ class DataFetcher:
       # if as a string or smth else:
       else:
          total_objs_amount = site_dict[item]['generic_quantity']
-         
+
       # convert to integer
       total_objs_amount = DataFetcher.refine_string(total_objs_amount)
 
-      # find how many full pages there will be
-      full_pages_amount = total_objs_amount // objs_per_page
+      if objs_per_page != 0:
+         # find how many full pages there will be
+         full_pages_amount = total_objs_amount // objs_per_page
 
-      # check if there are exessive objects
-      if full_pages_amount < (total_objs_amount / objs_per_page):
-         full_pages_amount += 1
+         # check if there are exessive objects
+         if full_pages_amount < (total_objs_amount / objs_per_page):
+            full_pages_amount += 1
 
-
-      return full_pages_amount
+         return full_pages_amount
+      else:
+         return 0
 
 
    def structure_data(self, content):
