@@ -5,10 +5,11 @@ from bs4 import BeautifulSoup as Bs
 
 
 class DataFetcher:
-   def __init__(self, responses, item, site_dict: dict):
+   def __init__(self, responses, item, data_fields: list, site_dict: dict):
       self.responses = responses
       self.site_dict = site_dict
       self.item = item
+      self.data_fields = data_fields
 
    @staticmethod
    def get_pages_amount(response, item, site_dict: dict):
@@ -81,12 +82,14 @@ class DataFetcher:
             quantities.append(n)
       
       actual_number = DataFetcher.find_smallest_val(quantities)
+
+      # if the data is needed to be saved, the data fields of the object are applied 
       for i in range(0, actual_number):
          obj = {
-            'title': content['titles'][i],
-            'integer': content['integers'][i],
-            'link': content['links'][i],
-            'image': content['images'][i]
+            self.data_fields[0]: content['titles'][i],
+            self.data_fields[1]: content['integers'][i],
+            self.data_fields[2]: content['links'][i],
+            self.data_fields[3]: content['images'][i]
          }
 
          list_of_objects.append(obj)
