@@ -33,15 +33,6 @@ async def get_response(session, url):
 	This function fetches the response data from the current page.
 	"""
 	async with session.get(url) as response:
-
-		# html data of the response
-		# html = await response.text()
-
-		# status code of the response
-		# status = response.status
-
-		# return {'html': html, 'status': status}
-
 		return await response.text()
 
 
@@ -105,18 +96,17 @@ async def main():
 	This function gives a life to the other ones
 	and makes the tasks be performed in a loop.
 	"""
-	# inquire a name of the internet bookstore,
-	# excel file name, 
+	# inquire a name of the internet bookstore, 
 	item = input('Enter the source name: ')
-	
-	# specify the name of the excel sheet
-	sheetname = input('enter the name of the sheet: ')
 
-	# the directory of the excel file is generated via substraction of both 
-	# 'tables' directory and a name of the internet bookmarket
-	file_name = 'tables/' + item + '.xlsx'
+	# custom name of the file
+	file_name = input('File name: ')
 
-	fields = books[item]['excel_fields']
+	# the preferred file extention
+	extention = input('File format: ')
+
+	# getting the fields specified in the configs file
+	fields = books[item]['fields']
 
 	# take tasks
 	results = await begin_session(item)
@@ -130,9 +120,7 @@ async def main():
 	# get structured data
 	books_list = scraper.structure_data(content)
 
-	# write the gotten objects to the excel sheet
-	data_manager.write_objs_to_excel(file_name, sheet=sheetname, list_of_objs=books_list, columns=scraper.data_fields)
-
+	### Data saving
 
 if __name__ == '__main__':
 

@@ -8,7 +8,7 @@ books = {
 		'image': {'tag': 'img', 'attribute': 'src'},
 		'generic_quantity': {'tag': 'form', 'class': 'form-horizontal', 'inlined_tag': 'strong'},
 		'obj_components': ['titles', 'integers', 'links', 'images'],
-		'excel_fields': ['title', 'price', 'link', 'image']
+		'fields': ['title', 'price', 'link', 'image']
 	},
 
 	'russian-books': {
@@ -20,7 +20,7 @@ books = {
 		'image': {'tag': 'img', 'attribute': 'src'},
 		'generic_quantity': {'tag': 'span', 'class': 'catalog-category_value'},
 		'obj_components': ['titles', 'integers', 'links', 'images'],
-		'excel_fields': ['title', 'price', 'link', 'image']
+		'fields': ['title', 'price', 'link', 'image']
 	},
 
 	'litres-books': {
@@ -32,7 +32,7 @@ books = {
         'image': {'tag': 'img', 'class': 'newCover__cover_WLFHk', 'attribute': 'src'},
         'generic_quantity': '99071',
         'obj_components': ['titles', 'integers', 'links', 'images'],
-        'excel_fields': ['title', 'price', 'link', 'image']
+        'fields': ['title', 'price', 'link', 'image']
 	},
 
 	'ali-books': {
@@ -44,6 +44,6 @@ books = {
 		'image': {'tag': 'img', 'class': 'gallery_Gallery__image__re6q0q', 'attribute': 'src'},
 		'generic_quantity': {'tag': 'span', 'class': 'snow-ali-kit_Typography__base__1shggo snow-ali-kit_Typography-Secondary__base__1i67dw snow-ali-kit_Typography__sizeTextM__1shggo SnowSearchHeading_SnowSearchHeading__count__b9qvy'},
 		'obj_components': ['titles', 'integers', 'links', 'images'],
-		'excel_fields': ['title', 'price', 'link', 'image']
+		'fields': ['title', 'price', 'link', 'image']
 	}
 }
