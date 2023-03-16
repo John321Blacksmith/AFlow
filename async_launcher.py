@@ -1,9 +1,26 @@
 """
-This testual module adheres the asynchronous conception.
-There are five functions which do a whole
-process of asynchronous web scraping.
+The main asynchronous trigger. It invokes both parsing ang data saving modules.
 
+## FORMING TASKS
+1. Getting a session object
+2. Receive a number of pages to be scraped and thus, number of tasks
+
+## STARTING A PROGRAM
+1. When the program starts, the user has to enter a configs keyword,
+   a name of the file and a preferred format.
+
+2. The parsing module is invoked receiving a list of tasks; it then
+   processes each of them, exctracting the data. Eventually, it returns
+   a list of objects.
+
+3. Then the data saving module does its work, taking the list of scraped objects and
+   stores them in one of the following formats specified by the user:
+       # JSON
+       # TXT
+       # XLSX
+       # CSV
 """
+
 import asyncio
 import aiohttp
 import data_manager
@@ -121,4 +138,3 @@ if __name__ == '__main__':
 
 	asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 	asyncio.run(main())
-	
