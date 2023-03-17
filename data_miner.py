@@ -5,11 +5,11 @@ from bs4 import BeautifulSoup as Bs
 
 
 class DataFetcher:
-   def __init__(self, responses, item, data_fields: list, site_dict: dict):
+   def __init__(self, responses, item, site_dict: dict):
       self.responses = responses
       self.site_dict = site_dict
       self.item = item
-      self.data_fields = data_fields
+      self.data_fields = site_dict[self.item]['fields']
 
    @staticmethod
    def get_pages_amount(response, item, site_dict: dict):

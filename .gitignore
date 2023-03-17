@@ -1,5 +1,6 @@
 scraper_env/
 __pycache__/
+tables/
 test.py
 test1.py
 *.xlsx

@@ -25,6 +25,7 @@ import asyncio
 import aiohttp
 import data_manager
 from data_miner import DataFetcher as Df
+from data_manager import Dumper
 from scraping_info import books
 
 
@@ -105,14 +106,11 @@ async def main():
 	# the preferred file extention
 	extention = input('File format: ')
 
-	# getting the fields specified in the configs file
-	fields = books[item]['fields']
-
 	# take tasks
 	results = await begin_session(item)
 
 	# define a parsing object
-	scraper = Df(results, item, fields, books)
+	scraper = Df(results, item, books)
 
 	# get unstructured data from each task
 	content = scraper.fetch_content()
@@ -121,6 +119,11 @@ async def main():
 	books_list = scraper.structure_data(content)
 
 	### Data saving
+	# define a data saving object
+	dumper = Dumper(file_name, item, extention, books_list, books)
+
+	# perform the operation
+	dumper.operate()
 
 if __name__ == '__main__':
 
