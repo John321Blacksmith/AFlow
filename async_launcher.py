@@ -119,13 +119,19 @@ async def main():
 	books_list = scraper.structure_data(content)
 
 	### Data saving
-	# define a data saving object
-	dumper = Dumper(file_name, item, extention, books_list, books)
 
-	# perform the operation
-	dumper.operate()
+	# if there is anything in the content, the data'll be saved,
+	# othervise, the program'll stop with a warning message
+	if books_list:
+		# define a data saving object
+		dumper = Dumper(file_name, item, extention, books_list, books)
+		# perform the operation
+		dumper.operate()
+	else:
+		print(f'Sorry, but you\'ve probably specified invalid HTML\nparsing configs for the source \'{item}\'.')
+
 
 if __name__ == '__main__':
-
+	# start the program
 	asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 	asyncio.run(main())

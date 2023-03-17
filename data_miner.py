@@ -12,7 +12,7 @@ class DataFetcher:
       self.data_fields = site_dict[self.item]['fields']
 
    @staticmethod
-   def get_pages_amount(response, item, site_dict: dict):
+   def get_pages_amount(response, item, site_dict: dict) -> int:
       """
       This method goes to the first page of the category, finds a total
       amount of objects, counts an amount of ones which are gotten per one 
@@ -61,7 +61,7 @@ class DataFetcher:
          return 0
 
 
-   def structure_data(self, content):
+   def structure_data(self, content) -> list:
       """
       This method receives unstructured content of
       each page and returns the structured ones.
@@ -81,23 +81,30 @@ class DataFetcher:
          if n != 0:
             quantities.append(n)
       
-      actual_number = DataFetcher.find_smallest_val(quantities)
+      # if the content is available, the next stage begins
+      # othervise, the method'll return a None object instead of the list
+      try:
+         actual_number = DataFetcher.find_smallest_val(quantities)
 
-      # if the data is needed to be saved, the data fields of the object are applied 
-      for i in range(0, actual_number):
-         obj = {
-            self.data_fields[0]: content['titles'][i],
-            self.data_fields[1]: content['integers'][i],
-            self.data_fields[2]: content['links'][i],
-            self.data_fields[3]: content['images'][i]
-         }
+         # if the data is needed to be saved, the data fields of the object are applied 
+         for i in range(0, actual_number):
+            obj = {
+               self.data_fields[0]: content['titles'][i],
+               self.data_fields[1]: content['integers'][i],
+               self.data_fields[2]: content['links'][i],
+               self.data_fields[3]: content['images'][i]
+            }
+   
+            list_of_objects.append(obj)
 
-         list_of_objects.append(obj)
+      except IndexError:
+         return None
 
-      return list_of_objects
+      else:
+         return list_of_objects
 
    @staticmethod
-   def inspect_signs(sign: str, seq: str, sign_num: int):
+   def inspect_signs(sign: str, seq: str, sign_num: int) -> int:
       count = 0
       for i in range(0, len(seq)):
          if seq[i] == sign:
@@ -246,7 +253,7 @@ class DataFetcher:
             # append this entity to the images family
             content_dict['images'].append(img_collection)
 
-   def fetch_content(self):
+   def fetch_content(self) -> dict:
       """
       This method does iteration through the taken
       tasks and extracts required data from each of them.
@@ -266,7 +273,7 @@ class DataFetcher:
       return content
 
    @staticmethod
-   def find_smallest_val(seq):
+   def find_smallest_val(seq) -> int:
       smallest_value = seq[0]
 
       for i in range(0, len(seq)):
@@ -274,5 +281,3 @@ class DataFetcher:
             smallest_value = seq[i]
    
       return smallest_value
-
-
