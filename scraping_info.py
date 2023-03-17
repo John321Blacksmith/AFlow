@@ -1,4 +1,5 @@
 books = {
+	'storage_name': 'tables',
 	'books-to-scrape': {
 		'source': 'http://books.toscrape.com/catalogue/page-{}.html',
 		'object': {'tag': 'li', 'class': 'col-xs-6 col-sm-4 col-md-3 col-lg-3'},
