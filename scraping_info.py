@@ -1,50 +1,22 @@
+agents = [
+	'Mozilla/5.0 (Linux; Android 5.0.1; LG-D332 Build/LRX22G) AppleWebKit/534.47 (KHTML, like Gecko)  Chrome/48.0.2206.146 Mobile Safari/537.1',
+	'Mozilla/5.0 (Windows; Windows NT 10.0; Win64; x64) Gecko/20100101 Firefox/50.9',
+	'Mozilla/5.0 (U; Linux i683 x86_64; en-US) Gecko/20100101 Firefox/71.2',
+	'Mozilla/5.0 (Macintosh; Intel Mac OS X 8_9_7) AppleWebKit/601.38 (KHTML, like Gecko) Chrome/53.0.2245.340 Safari/535',
+	'Mozilla/5.0 (Linux; Android 7.1.1; LG-H910 Build/NRD90M) AppleWebKit/602.37 (KHTML, like Gecko)  Chrome/48.0.2118.264 Mobile Safari/600.7',
+	'Mozilla/5.0 (Linux; Linux x86_64) AppleWebKit/601.30 (KHTML, like Gecko) Chrome/55.0.2865.344 Safari/533',
+	'Mozilla/5.0 (Android; Android 7.1.1; Xperia V Build/NDE63X) AppleWebKit/602.22 (KHTML, like Gecko)  Chrome/48.0.3704.195 Mobile Safari/600.8',
+	'Mozilla/5.0 (iPhone; CPU iPhone OS 9_9_6; like Mac OS X) AppleWebKit/534.50 (KHTML, like Gecko)  Chrome/51.0.2831.131 Mobile Safari/537.3',
+	'Mozilla/5.0 (Linux; Android 5.1.1; SAMSUNG SM-G935I Build/LMY47X) AppleWebKit/603.20 (KHTML, like Gecko)  Chrome/49.0.3991.330 Mobile Safari/535.8',
+	'Mozilla/5.0 (Android; Android 6.0; HTC One M9 Build/MRA58K) AppleWebKit/602.4 (KHTML, like Gecko)  Chrome/55.0.3724.336 Mobile Safari/534.6'
+]
+
+
 books = {
-	'storage_name': 'tables',
-	'books-to-scrape': {
-		'source': 'http://books.toscrape.com/catalogue/page-{}.html',
-		'object': {'tag': 'li', 'class': 'col-xs-6 col-sm-4 col-md-3 col-lg-3'},
-		'title': {'tag': 'h3'},
-		'integer': {'tag': 'p', 'class': 'price_color'},
-		'link': {'tag': 'a', 'attribute': 'src'},
-		'image': {'tag': 'img', 'attribute': 'src'},
-		'generic_quantity': {'tag': 'form', 'class': 'form-horizontal', 'inlined_tag': 'strong'},
-		'obj_components': ['titles', 'integers', 'links', 'images'],
-		'fields': ['title', 'price', 'link', 'image']
-	},
-
-	'russian-books': {
-		'source': 'https://www.books.ru/spravochniki-9001366/?page={}',
-		'object':  {'tag': 'div', 'class': 'book-catalog_item'},
-		'title': {'tag': 'a', 'class': 'custom-link book-catalog_item_title'},
-		'integer': {'tag': 'span', 'class': 'book-price'},
-		'link': {'tag': 'a'},
-		'image': {'tag': 'img', 'attribute': 'src'},
-		'generic_quantity': {'tag': 'span', 'class': 'catalog-category_value'},
-		'obj_components': ['titles', 'integers', 'links', 'images'],
-		'fields': ['title', 'price', 'link', 'image']
-	},
-
-	'litres-books': {
-		'source': 'https://www.litres.ru/genre/knigi-fantastika-5004/',
-		'object': {'tag': 'div', 'class': 'Art-module__wrapper_8_qbP Minigrid__Art_nquiC'},
-        'title': {'tag': 'div', 'class': 'Art-module__name__row_2S_Yp'},
-        'integer': {'tag': 'p', 'class': 'RatingStars-module__value_2DvQU'},
-        'link': {'tag': 'a', 'class': 'Art-module__imageWrapper_3sDLf'},
-        'image': {'tag': 'img', 'class': 'newCover__cover_WLFHk', 'attribute': 'src'},
-        'generic_quantity': '99071',
-        'obj_components': ['titles', 'integers', 'links', 'images'],
-        'fields': ['title', 'price', 'link', 'image']
-	},
-
-	'ali-books': {
-		'source': 'https://aliexpress.ru/category/205958512/books-new.html?g=y&page={}',
-		'object': {'tag': 'div', 'class': 'product-snippet_ProductSnippet__content__52z59'},
-		'title': {'tag': 'div', 'class': 'product-snippet_ProductSnippet__name__52z59'},
-		'integer': {'tag': 'div', 'class': 'snow-price_SnowPrice__mainM__azqpin'},
-		'link': {'tag': 'a', 'class': 'product-snippet_ProductSnippet__galleryBlock__52z59'},
-		'image': {'tag': 'img', 'class': 'gallery_Gallery__image__re6q0q', 'attribute': 'src'},
-		'generic_quantity': {'tag': 'span', 'class': 'snow-ali-kit_Typography__base__1shggo snow-ali-kit_Typography-Secondary__base__1i67dw snow-ali-kit_Typography__sizeTextM__1shggo SnowSearchHeading_SnowSearchHeading__count__b9qvy'},
-		'obj_components': ['titles', 'integers', 'links', 'images'],
-		'fields': ['title', 'price', 'link', 'image']
+	'test': {
+		'source': 'https://books.toscrape.com/',
+		'next_p': 'li.next a',
+		'link': 'h3 a',
+		'object': ''
 	}
 }

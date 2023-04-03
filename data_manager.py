@@ -1,79 +1,40 @@
-"""
-This module contains the functionality to format the scraped data to the Excel tables.
-"""
-import json
-import openpyxl
-import pandas as pd
+import csv
+import requests
+from bs4 import BeautifulSoup as Bs
+from urllib.parse import urljoin
+from scraping_info import agents, books
 
-class Dumper:
+
+def fetch_links(url, links=[]):
+	response = requests.get(url)
+	print(response.url, flush=True)
+
+	soup = Bs(response.text, 'html.parser')
+	for link in soup.select(books['test']['link']):
+		links.append(urljoin(url, link.get('href')))
+
+	next_page = soup.select_one(books['test']['next_p'])
+
+	if next_page:
+		return fetch_links(urljoin(url, next_page.get('href')), links)  # recursive case
+	else:
+		return links # base case
+
+
+def refresh_links():
+	links = fetch_links(books['test']['source'])
+
+	with open('links.csv', mode='w') as f:
+		for link in links:
+			f.write(link + '\n')
+
+
+def write_to_text(objects):
 	"""
-	This class creates a data dumper object bound with 
-	taken data as its attributes and performs operation
-	based on the user's input.
+	This function receives a list of objects and dumps all of them tho the file.
 	"""
-	
-	def __init__(
-				self,
-				filename,
-				keyword,
-				f_ext,
-				list_of_objs,
-				confs
-			):
-		self.keyword = keyword
-		self.f_ext = f_ext
-		self.objs = list_of_objs
-		self.confs = confs
-		# define a dataframe
-		self.dataframe = pd.DataFrame(
-								data=self.objs,
-								columns=self.confs[self.keyword]['fields']
-								)
-		# define which directory the file goes to
-		self.storage = self.confs['storage_name'] + '/' + filename
-
-	def write_to_excel(self):
-		self.dataframe.to_excel(f'{self.storage}.xlsx'.format(self.storage), index=False, engine='openpyxl')
+	pass
 
 
-	def write_to_json(self):
-		self.dataframe.to_json(f'{self.storage}.json'.format(self.storage))
-
-
-	def write_to_csv(self):
-		self.dataframe.to_csv(f'{self.storage}.csv'.format(self.storage), index=False)
-
-
-	def write_to_text(self):
-		with open(f'{self.storage}.txt'.format(self.storage), mode='w', encoding='utf-8') as f:
-			row = 0
-			headers = self.confs[self.keyword]['fields']
-			for i in range(0, len(self.objs)):
-				for key, value in self.objs[i].items():
-					if i == 0:
-						f.writerow(headers)
-						i += 1
-					else:
-						f.writerow((key, value))
-
-
-	def operate(self):
-		"""
-		Perform dumping the scraped data to the specified format.
-		"""
-		# this control flow defines which method
-		# to use accordingly the specified extention 
-		if self.f_ext == 'excel':
-			self.write_to_excel()
-
-		elif self.f_ext == 'csv':
-			self.write_to_csv()
-
-		elif self.f_ext == 'json':
-			self.write_to_json()
-
-		else:
-			self.write_to_text()
-
-		print('done')
-
+if __name__ == '__main__':
+	refresh_links()

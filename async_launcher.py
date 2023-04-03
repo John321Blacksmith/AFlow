@@ -1,137 +1,95 @@
-"""
-The main asynchronous trigger. It invokes both parsing ang data saving modules.
-
-## FORMING TASKS
-1. Getting a session object
-2. Receive a number of pages to be scraped and thus, number of tasks
-
-## STARTING A PROGRAM
-1. When the program starts, the user has to enter a configs keyword,
-   a name of the file and a preferred format.
-
-2. The parsing module is invoked receiving a list of tasks; it then
-   processes each of them, exctracting the data. Eventually, it returns
-   a list of objects.
-
-3. Then the data saving module does its work, taking the list of scraped objects and
-   stores them in one of the following formats specified by the user:
-       # JSON
-       # TXT
-       # XLSX
-       # CSV
-"""
-
+import re
+import time
+import csv
+import random
 import asyncio
 import aiohttp
-import data_manager
-from data_miner import DataFetcher as Df
-from data_manager import Dumper
-from scraping_info import books
+import pandas as pd
+from urllib.parser import urljoin
+from scraping_info import agents
+
+
+async def get_links(file_name):
+	links = []
+	try:
+		with open(file_name, mode='r', encoding='utf-8') as f:
+			reader = csv.reader(f)
+
+			for i, row in enumerate(reader):
+				links.append(row[0])
+	except FileNotFoundError:
+		print(f'File {file_name} not found')
+	else:
+		return links
 
 
 async def get_response(session, url):
-	"""
-	This function fetches the response data from the current page.
-	"""
 	async with session.get(url) as response:
 		return await response.text()
+		 
 
 
-async def collect_tasks_from_each_page(session, item):
+async def create_tasks():
 	"""
-	This function goes through each page and collects tasks to
-	be performed asynchronously.
+	This function receives a list of links to be requested, starts a session and
+	catches a response from each link and gathers the responses as tasks.
 	"""
+	async with aiohttp.ClientSession(headers={'User-Agent': random.choice(agents)}) as session:
+		tasks = []
+		links = await get_links('links.csv')
+		for link in links:
+			tasks.append(asyncio.create_task(get_response(session, link)))
+		results = await asyncio.gather(*tasks)
 
-	# define a task bag
-	tasks = []
+		return results
 
-	# define a number of pages to be processed
-	num_of_pages = await find_pages_amount(session, item)
 	
-	# # wade through the urls list
-	for i in range(0, num_of_pages):
-		# get the task
-		n = i + 1
-		task = asyncio.create_task(get_response(session, books[item]['source'].format(n)))
-		tasks.append(task)
-
-	# gather all the tasks in one object corountine
-	result = await asyncio.gather(*tasks)
-
-	return result
-
-
-async def find_pages_amount(session, item):
+async def extract_data(results) -> list:
 	"""
-	This async function invokes a parser method that finds an amount 
-	of pages and so defines a quantity of tasks to be performed.
+	This function receives a bunch of results to be scraped,
+	goes through each one and extracts data and forms a dictionary object.
+	It then returns a list of objects which come to the database.
 	"""
-	amount = None
+	list_ofobjects = []
+	for i in range(0, len(results)):
+		soup = Bs(results[i], 'html.parser')
+		objs = soup.select(site_dict[item]['object'])
+		for j in range(0, len(objs)):
+			title = objs[j].select(site_dict[item]['title'])
+			price = objs[j].select(site_dict[item]['price'])
+			link = objs[j].select(site_dict[item]['link'])
+			image = objs[j].select(site_dict[item]['image'])
 
-	# get a single response
-	response = await get_response(session, books[item]['source'].format(1))
-	if response:
-		# utilize a parser
-		amount = Df.get_pages_amount(response, item, books)
+			obj = {
+				'title' = title.text,
+				'price' = price.text,
+				'link' = urljoin(site_dict[item]['source'], link),
+				'image' = urljoin(site_dict[item]['source'], image)
+			}
 
-	return amount
+			list_of_objects.append(obj)
 
-
-async def begin_session(item):
-	"""
-	This function performs these two above,
-	giving a session object and initializing the web data.
-	Returns a bunch of materials based on requests and enclosed
-	as tasks to be performed asynchronously
-	"""
-	async with aiohttp.ClientSession() as session:
-		# gather a list of responses
-		data = await collect_tasks_from_each_page(session, item)
-
-		return data
+	return list_of_objects
 
 
 async def main():
 	"""
-	This function gives a life to the other ones
-	and makes the tasks be performed in a loop.
+	This function performs a data saving operation 
+	and indicates an amount of working time the program has taken.
 	"""
-	# inquire a name of the internet bookstore, 
-	item = input('Enter the source name: ')
+	start_time = time.time()
+	# get the results to be processed
+	results = await create_tasks()
 
-	# custom name of the file
-	file_name = input('File name: ')
+	# get a list of objects to be dumped to an excel file
+	objects = await extract_data(results)
 
-	# the preferred file extention
-	extention = input('File format: ')
+	# create a data frame via the pandas library
+	df = pd.DataFrame(filename='tables/books.xlsx')
 
-	# take tasks
-	results = await begin_session(item)
-
-	# define a parsing object
-	scraper = Df(results, item, books)
-
-	# get unstructured data from each task
-	content = scraper.fetch_content()
-
-	# get structured data
-	books_list = scraper.structure_data(content)
-
-	### Data saving
-
-	# if there is anything in the content, the data'll be saved,
-	# othervise, the program'll stop with a warning message
-	if books_list:
-		# define a data saving object
-		dumper = Dumper(file_name, item, extention, books_list, books)
-		# perform the operation
-		dumper.operate()
-	else:
-		print(f'Sorry, but you\'ve probably specified invalid HTML\nparsing configs for the source \'{item}\'.')
+	print(f'Process finished at {(time.time() - start_time):.2f} seconds')
 
 
 if __name__ == '__main__':
-	# start the program
 	asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 	asyncio.run(main())
