@@ -14,9 +14,15 @@ agents = [
 
 books = {
 	'test': {
+		'directory': 'tables',
 		'source': 'https://books.toscrape.com/',
 		'next_p': 'li.next a',
 		'link': 'h3 a',
-		'object': ''
+		'object': '#content_inner > article > div.row',
+		'title': 'div.col-sm-6.product_main > h1',
+		'price': 'div.col-sm-6.product_main > p.price_color',
+		'link': 'div.col-sm-6.product_main > p.instock.availability',
+		'image': '#product_gallery > div > div > div > img',
+		'fields': ['title', 'price', 'link', 'image']
 	}
 }

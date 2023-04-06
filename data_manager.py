@@ -5,15 +5,15 @@ from urllib.parse import urljoin
 from scraping_info import agents, books
 
 
-def fetch_links(url, links=[]):
+def fetch_links(url, site_dict, links=[]):
 	response = requests.get(url)
 	print(response.url, flush=True)
 
 	soup = Bs(response.text, 'html.parser')
-	for link in soup.select(books['test']['link']):
+	for link in soup.select(site_dict['test']['link']):
 		links.append(urljoin(url, link.get('href')))
 
-	next_page = soup.select_one(books['test']['next_p'])
+	next_page = soup.select_one(site_dict['test']['next_p'])
 
 	if next_page:
 		return fetch_links(urljoin(url, next_page.get('href')), links)  # recursive case
@@ -21,8 +21,8 @@ def fetch_links(url, links=[]):
 		return links # base case
 
 
-def refresh_links():
-	links = fetch_links(books['test']['source'])
+def refresh_links(site_dict):
+	links = fetch_links(site_dict['test']['source'])
 
 	with open('links.csv', mode='w') as f:
 		for link in links:
