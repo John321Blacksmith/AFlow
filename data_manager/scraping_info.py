@@ -16,12 +16,13 @@ agents = [
 scraping_data = {
     'books': {
         'source': 'https://books.toscrape.com/',
+        'links_file': 'books.txt',
         'object': '//article[@class="product_pod"]',
         'title': '//a/@title',
         'image': '//img[@class="thumbnail"]/@src',
         'link': '//a/@href',
         'price': '//p[@class="price_color"]',
         'fields': ['title', 'image', 'link', 'price'],
-        'next_page': 'li.next a',
+        'next_page': '.next > a:nth-child(1)',
     },
 }
