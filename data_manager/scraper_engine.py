@@ -1,25 +1,9 @@
 import asyncio
+import pandas
 import requests_html
 from urllib.parse import urljoin
 from requests_html import AsyncHTMLSession
-from scraping_info import scraping_data
-
-# tasks iterator here
-class AsyncIterator:
-    def __init__(self, sequence):
-        self._sequence = sequence
-        self._index = 0
-
-    async def __aiter__(self):
-        return self
-
-    async def __anext__(self):
-        if self._index < len(self._sequence):
-            item = self._sequence[self._index]
-            self._index += 1
-            return item
-        else:
-            raise StopAsyncIteration
+from scraping_info import scraping_data, auction_site
 
 
 class LinksLoadingManager:
@@ -40,9 +24,9 @@ class LinksLoadingManager:
         :returns: list[str]
 
     """
-    def __init__(self, site_dict: dict[dict], item: str):
+    def __init__(self, site_dict: dict[dict]):
         self.site_dict = site_dict
-        self.item = item 
+        
 
     async def save_links(self, parsed_links: list[str]) -> None:
         """
@@ -50,9 +34,9 @@ class LinksLoadingManager:
         save each one to the disk.
         """
         try:
-            with open(self.site_dict[self.item]['links_file'], mode='a', encoding='utf-8') as f:
-                for i in range(0, len(parsed_links)):
-                    f.write(f'{parsed_links[i]}\n')
+            with open(self.site_dict['links_file'], mode='w') as f:
+                for link in parsed_links:
+                    f.write(link + '\n')
         except (Exception, FileNotFoundError) as error:
             print(f'Couldn\'t save data because {error}')
         else:
@@ -64,9 +48,10 @@ class LinksLoadingManager:
         stored and pull each one out to the list.
         """
         try:
-            with open(self.site_dict[self.item]['links_file'], mode='r', encoding='utf-8') as f:
-                for link in f.readlines():
-                    links.append(link)
+            with open(self.site_dict['links_file'], newline='') as f:
+                reader = csv.reader(f)
+                for i, row in enumerate(reader):
+                    links.append(row[0])
         except (Exception, FileNotFoundError) as error:
             print(f'Couldn\'t perform operation because {error}')
         else:
@@ -132,6 +117,60 @@ class WebRequestManager:
 
         return results
 
+class WebCrawler:
+    """
+    This object picks all
+    the links from a web
+    site and returns a 
+    list of them.
+
+    async def crawl_links(url:str, counter=1):
+        :url: str
+        :counter: 1, int
+        :returns: list[str]
+
+    """
+    def __init__(self, site_dict: dict):
+        self.site_dict = site_dict
+        self.web_manager = WebRequestManager()
+        self.crawled_links = []
+
+    async def crawl_links(self, url, counter=1) -> list[str]:
+        """
+        Go to a particular url
+        and extract all the
+        next page elements
+        using an amount of 
+        them to jump on another.
+        """
+        response = await self.web_manager.get_response(url)
+        next_page_elements = response.html.find(self.site_dict['n_p_element'])
+
+        amount = len(next_page_elements)
+        
+        if amount != 0:
+            for i in range(0, amount):
+                self.crawled_links.append(urljoin(self.site_dict['source'], next_page_elements[i].attrs['href']))
+            counter += amount
+            return await self.crawl_links(f'{self.site_dict["source"]}{self.site_dict["n_p_slug"]}{counter}', counter)
+        else:
+            return self.crawled_links
+
+    async def extract_links(self, url: str):
+        """
+        Go through each page and
+        parse its url recursively.
+        """
+        self.crawled_links.append(url)
+        response = await self.web_manager.get_response(url)
+        next_page_slug = response.html.find(self.site_dict['n_p_element'])
+        
+        if next_page_slug:
+            url = urljoin(url, next_page_slug[0].attrs['href'])
+            return await self.extract_links(url) # recursive case
+        else:
+            return self.crawled_links # base case
+
 
 class DataFetcher:
     """
@@ -153,10 +192,11 @@ class DataFetcher:
     
     """
     
-    def __init__(self, site_dict: dict[dict], item: str):
-        self.web_manager = WebRequestManager()
+    def __init__(self, site_dict: dict[dict]):
         self.site_dict = site_dict
-        self.item = item
+        self.web_manager = WebRequestManager()
+        self.crawled_links = []
+        
 
     async def extract_data(self, urls:list[str], list_of_objs=[]) -> list[dict]:
         """
@@ -167,49 +207,24 @@ class DataFetcher:
         """
         results = await self.web_manager.create_tasks(urls)
         for i in range(0, len(results)):
-            objects = results[i].html.xpath(self.site_dict[self.item]['object'])
+            objects = results[i].html.xpath(self.site_dict['object'])
             for j in range(0, len(objects)):
                 obj = {
-                    'title': objects[j].xpath(self.site_dict[self.item]['title'])[0],
-                    'price': objects[j].xpath(self.site_dict[self.item]['price'])[0].text,
-                    'image': objects[j].xpath(self.site_dict[self.item]['image'])[0],
-                    'link': objects[j].xpath(self.site_dict[self.item]['link'])[0],
+                    'title': objects[j].xpath(self.site_dict['title'])[0],
+                    'price': objects[j].xpath(self.site_dict['price'])[0].text,
+                    'image': urljoin(self.site_dict['source'], objects[j].xpath(self.site_dict['image'])[0]),
+                    'link': urljoin(self.site_dict['source'], objects[j].xpath(self.site_dict['link'])[0]),
                 }
                 list_of_objs.append(obj)
 
         return list_of_objs
 
 
-    async def extract_links(self, url: str, links=[]):
-        """
-        Go through each page and
-        parse its url recursively.
-        """
-        links.append(url)
-        response = await self.web_manager.get_response(url)
-        next_page_slug = response.html.find(self.site_dict[self.item]['next_page'])
-        if next_page_slug:
-            url = urljoin(url, next_page_slug[0].attrs['href'])
-            return await self.extract_links(url, links) # recursive case
-        else:
-            return links # base case
-
 
 async def main():
-    # saving links operation 
-    
-    # links_scraper = DataFetcher(scraping_data, 'books')
-    # links = await links_scraper.extract_links(links_scraper.site_dict['books']['source'])
-    # await links_manager.save_links(links)
-
-
-    # retrieving & webcrawling operation
-
-    # links_manager = LinksLoadingManager(scraping_data, 'books')
-    # links = await links_manager.retrieve_links()
-    # data_fetcher = DataFetcher(scraping_data, 'books')
-    # objects = await data_fetcher.extract_data(links)
-    # print(objects)
+    webcrawler = WebCrawler(auction_site)
+    links = await webcrawler.extract_links(auction_site['source'])
+    print(links)
 
 
 if __name__ == '__main__':
