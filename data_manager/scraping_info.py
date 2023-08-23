@@ -14,15 +14,31 @@ agents = [
 
 # the confs DS with xpath elements
 scraping_data = {
-    'books': {
-        'source': 'https://books.toscrape.com/',
-        'links_file': 'books.txt',
-        'object': '//article[@class="product_pod"]',
-        'title': '//a/@title',
-        'image': '//img[@class="thumbnail"]/@src',
-        'link': '//a/@href',
-        'price': '//p[@class="price_color"]',
-        'fields': ['title', 'image', 'link', 'price'],
-        'next_page': '.next > a:nth-child(1)',
-    },
+    'source': 'https://books.toscrape.com/',
+    'links_file': 'books.csv',
+    'object': '//article[@class="product_pod"]',
+    'title': '//a/@title',
+    'image': '//img[@class="thumbnail"]/@src',
+    'link': '//a/@href',
+    'price': '//p[@class="price_color"]',
+    'fields': ['title', 'image', 'link', 'price'],
+    'n_p_element': '.next > a:nth-child(1)',
+    'n_p_slug': 'catalogue/page-',
+}
+
+auction_site = {
+	'source': 'https://nedradv.ru/nedradv/ru/auction',
+	'table': '.g-color-black-opacity-0_6',
+	'row': 'tr',
+	'link': 'a',
+	'object': '/html/body/main/section[3]/div/div[1]/div[1]',
+	'date': './/div[1]/h1',
+	'square': './/div[1]/p',
+	'region': './/div[1]/h1',
+	'status': './/dl[1]/dd',
+	'submit_deadline': './/dl[8]',
+	'contribution': './/dl[4]',
+	'organizer': './/dl[6]',
+	'n_p_element': '.u-pagination-v1-4--active',
+	'months': ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
 }
