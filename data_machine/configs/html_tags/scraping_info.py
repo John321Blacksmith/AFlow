@@ -11,11 +11,10 @@ agents = [
 	'Mozilla/5.0 (Android; Android 6.0; HTC One M9 Build/MRA58K) AppleWebKit/602.4 (KHTML, like Gecko)  Chrome/55.0.3724.336 Mobile Safari/534.6'
 ]
 
-
+ 
 # the confs DS with xpath elements
-scraping_data = {
+books = {
     'source': 'https://books.toscrape.com/',
-    'links_file': 'books.csv',
     'object': '//article[@class="product_pod"]',
     'title': '//a/@title',
     'image': '//img[@class="thumbnail"]/@src',
