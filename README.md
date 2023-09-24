@@ -5,7 +5,6 @@ PostgreSQL
 Celery
 RabbitMQ
 Docker
-Ubuntu
 I. DESCRIPTION
 
 This app represents a basic web aggregator that collects, processes and
