@@ -20,7 +20,7 @@ class DataBase:
 		:return: psycopg2.Connection
 	"""
 	def __init__(self, filename):
-		...
+		self.filename = filename
 
 	def get_params(self) -> dict:
 		"""
