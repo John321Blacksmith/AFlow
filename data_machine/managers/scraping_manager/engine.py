@@ -18,7 +18,7 @@ class LinksLoadingManager:
     and, as the next step, pulls
     them out from the file to use
     each one in sending a request
-    the the server.
+    to the server.
 
     async def save_links(source, file_name):
         :source: str
@@ -220,14 +220,17 @@ class DataFetcher:
         self.crawled_links = []
         
 
-    async def extract_data(self, urls:list[str], list_of_objs=[]) -> list[dict]:
+    async def extract_data(self, urls:list[str], list_of_objs=[], local=False) -> list[dict]:
         """
         Go through each response
         and scrape required data
         and return a bunch of 
         objects.
         """
-        results = await self.web_manager.create_tasks(urls)
+        if local:
+            results
+        else:
+            results = await self.web_manager.create_tasks(urls)
         for i in range(0, len(results)):
             objects = results[i].html.xpath(self.site_dict['object'])
             for j in range(0, len(objects)):
@@ -257,6 +260,7 @@ async def main():
         print('it is empty, the webcrawler\'s gonna work...')
         links = await webcrawler.extract_links(webcrawler.site_dict['source'])
         await links_manager.save_links(parsed_links=links)
+
 
 
     # throwing requests to the server & scraping the HTMLs
