@@ -34,7 +34,7 @@ class LinksLoadingManager:
         self.path_to_csv = path_to_csv
         
 
-    async def save_links(self, parsed_links: list[str]) -> None:
+    async def save_links(self, parsed_links: list[str]) -> bool:
         """
         Take a list of links and
         save each one to the disk.
@@ -44,9 +44,9 @@ class LinksLoadingManager:
                 df = pd.DataFrame(data=parsed_links)
                 df.to_csv(f, header=False, index=False, lineterminator='\n')
         except (Exception, FileNotFoundError) as error:
-            print(f'Couldn\'t save data because {error}')
+            return False
         else:
-            print(f'The links have been saved to the file {f.name}')
+            return True
 
     async def retrieve_links(self, links=[]) -> list[str]:
         """
@@ -192,7 +192,7 @@ class WebCrawler:
             return await self.extract_links(url) # recursive case
         else:
             return self.crawled_links # base case
-
+ 
 
 class DataFetcher:
     """
