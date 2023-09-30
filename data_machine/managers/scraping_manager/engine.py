@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import asyncio
@@ -6,7 +7,9 @@ import requests_html
 from urllib.parse import urljoin
 from requests_html import AsyncHTMLSession
 
-sys.path.append('..\\..\\configs\\html_tags')
+confs_path = os.getcwd()[:48] + '\\' + 'data_machine\\configs\\html_tags'
+sys.path.append(confs_path)
+
 from scraping_info import books
 
 
@@ -34,7 +37,7 @@ class LinksLoadingManager:
         self.path_to_csv = path_to_csv
         
 
-    async def save_links(self, parsed_links: list[str]) -> None:
+    async def save_links(self, parsed_links: list[str]) -> bool:
         """
         Take a list of links and
         save each one to the disk.
@@ -44,9 +47,9 @@ class LinksLoadingManager:
                 df = pd.DataFrame(data=parsed_links)
                 df.to_csv(f, header=False, index=False, lineterminator='\n')
         except (Exception, FileNotFoundError) as error:
-            print(f'Couldn\'t save data because {error}')
+            return False
         else:
-            print(f'The links have been saved to the file {f.name}')
+            return True
 
     async def retrieve_links(self, links=[]) -> list[str]:
         """
@@ -59,7 +62,7 @@ class LinksLoadingManager:
                 for i in range(0, len(links_frame[0])):
                     links.append(links_frame[0][i])
         except (Exception, FileNotFoundError) as error:
-            print(f'Couldn\'t perform operation because {error}')
+            return None
         else:
             return links
 
@@ -192,7 +195,7 @@ class WebCrawler:
             return await self.extract_links(url) # recursive case
         else:
             return self.crawled_links # base case
-
+ 
 
 class DataFetcher:
     """
@@ -279,7 +282,3 @@ async def main():
             print('\n\n')
     except IndexError:
         print('No items found')
-
-
-if __name__ == '__main__':
-    asyncio.run(main())
