@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import asyncio
@@ -6,7 +7,9 @@ import requests_html
 from urllib.parse import urljoin
 from requests_html import AsyncHTMLSession
 
-sys.path.append('..\\..\\configs\\html_tags')
+confs_path = os.getcwd()[:48] + '\\' + 'data_machine\\configs\\html_tags'
+sys.path.append(confs_path)
+
 from scraping_info import books
 
 
@@ -59,7 +62,7 @@ class LinksLoadingManager:
                 for i in range(0, len(links_frame[0])):
                     links.append(links_frame[0][i])
         except (Exception, FileNotFoundError) as error:
-            print(f'Couldn\'t perform operation because {error}')
+            return None
         else:
             return links
 
@@ -279,7 +282,3 @@ async def main():
             print('\n\n')
     except IndexError:
         print('No items found')
-
-
-if __name__ == '__main__':
-    asyncio.run(main())

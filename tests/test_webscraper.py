@@ -1,19 +1,16 @@
 import os
 import sys
 import unittest
-from pathlib import Path
-ROOT_PATH = Path(__file__).resolve().parent
-sys.path.append(os.path.join(ROOT_PATH, ''))
 
-print(sys.path)
+scraper_path = os.getcwd()[:48] + '\\' + 'data_machine\\managers\\scraping_manager'
+sys.path.append(scraper_path)
 
-
-from scraping_manager.engine import (
+from engine import (
 		LinksLoadingManager,
 		DataFetcher
 	)
 
-class TestWebCrawlingLogic:
+class TestWebCrawlingLogic(unittest.TestCase):
 	"""
 	This test checks the work
 	of the WebCrawler.
@@ -28,11 +25,12 @@ class TestWebCrawlingLogic:
 		...
 
 
-class TestLinksLoaderLogic:
+class TestLinksLoaderLogic(unittest.TestCase):
 	"""
 	This test checks the work
 	of the LinksLoading Manager.
 	"""
+
 	def setUp(self):
 		self.mock_links = [
 			'https://www.test0.com',
@@ -96,9 +94,13 @@ class TestLinksLoaderLogic:
 		self.assertIs(self.links_manager.csv_is_full(), True)
 
 
-class TestDataFetcherLogic:
+class TestDataFetcherLogic(unittest.TestCase):
 	"""
 	This test checks the work
 	of the data extraction unit
 	"""
 	...
+
+
+if __name__ == '__main__':
+	unittest.main()
