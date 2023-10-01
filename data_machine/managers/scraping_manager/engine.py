@@ -230,10 +230,8 @@ class DataFetcher:
         and return a bunch of 
         objects.
         """
-        if local:
-            results
-        else:
-            results = await self.web_manager.create_tasks(urls)
+           
+        results = await self.web_manager.create_tasks(urls)
         for i in range(0, len(results)):
             objects = results[i].html.xpath(self.site_dict['object'])
             for j in range(0, len(objects)):
@@ -248,8 +246,7 @@ class DataFetcher:
         return list_of_objs
 
 
-
-async def main():
+async def scraping_task():
     csv = '..\\..\\instant_files\\links.csv'
     # classes instantiation
     webcrawler = WebCrawler(site_dict=books)
