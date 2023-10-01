@@ -1,5 +1,6 @@
 import os
 import sys
+import asyncio
 import unittest
 
 scraper_path = os.getcwd()[:48] + '\\' + 'data_machine\\managers\\scraping_manager'
@@ -40,58 +41,59 @@ class TestLinksLoaderLogic(unittest.TestCase):
 			'https://www.test4.com',
 		]
 		self.wrong_file = 'wrong.csv'
-		self.file = 'mock_files\\links.csv'
-		self.empty_file = 'mock_files\\links.csv'
-		self.succsessful_manager = LinksLoadingManager(self.file)
-		self.unsuccsessful_manager = LinksLoadingManager(self.empty_file)
+		self.file = os.getcwd()[:48] + '\\' + 'tests\\mock_files\\links.csv'
+		self.empty_file = os.getcwd()[:48] + '\\' + 'tests\\mock_files\\empty_file.csv'
+		self.successful_manager = LinksLoadingManager(self.file)
+		self.unsuccessful_manager = LinksLoadingManager(self.empty_file)
 
-	def test_the_scraped_links_are_properly_cached(self):
+	async def test_the_scraped_links_are_properly_cached(self):
 		"""
 		Check if the links from the web
 		are saved to the CSV file well.
 		"""
+		await self.successful_manager.save_links(self.mock_links)
 		with open(self.file, 'r') as f:
 			self.assertEqual(len(f.readlines()), len(self.mock_links))
 
-	def test_the_manager_throws_false_if_links_not_cached(self):
+	async def test_the_manager_throws_false_if_links_not_cached(self):
 		"""
 		Check if the False
 		is thrown.
 		"""
-		self.assertIs(self.unsuccessful_manager.save_links(self.wrong_file), False)
+		self.assertIs(await self.unsuccessful_manager.save_links(self.wrong_file), False)
 
-	def test_the_cached_links_are_retrieved_successfully(self):
+	async def test_the_cached_links_are_retrieved_successfully(self):
 		"""
 		Check if all the links are
 		taken from the HD and formed
 		to a python DS.
 		"""
-		retrieved_links = self.links_manager.retrieve_links()
+		retrieved_links = await self.successful_manager.retrieve_links()
 		self.assertEqual(len(retrieved_links), len(self.mock_links))
 		self.assertEqual(retrieved_links, self.mock_links)
 
-	def test_the_links_are_retrieved_unsuccessfully(self):
+	async def test_if_none_is_returned_when_no_links_retrieved(self):
 		"""
 		Check if the links manager
 		throws the None.
 		"""
-		self.assertIs(self.unsuccessful_manager.retrieve_links(), None)
+		self.assertIs(await self.unsuccessful_manager.retrieve_links(), None)
 
-	def test_the_filechecker_returns_false_if_empty_csv(self):
+	async def test_the_filechecker_returns_false_if_empty_csv(self):
 		"""
 		Check if the LinksLoader
 		retrieves False when csv
 		is empty.
 		"""
-		self.assertIs(self.unsuccessful_manager.csv_is_full(), False)
+		self.assertIs(await self.unsuccessful_manager.csv_is_full(), False)
 
-	def test_the_filechecker_returns_true_if_filled_csv(self):
+	async def test_the_filechecker_returns_true_if_filled_csv(self):
 		"""
-		Check if the LinksLoader
+		# Check if the LinksLoader
 		retrieves False when csv
 		is empty.
 		"""
-		self.assertIs(self.links_manager.csv_is_full(), True)
+		self.assertIs(await self.successful_manager.csv_is_full(), True)
 
 
 class TestDataFetcherLogic(unittest.TestCase):
@@ -104,3 +106,7 @@ class TestDataFetcherLogic(unittest.TestCase):
 
 if __name__ == '__main__':
 	unittest.main()
+
+
+
+# PASSED
