@@ -2,5 +2,5 @@
 __pycache__/
 *.ini
 *.html
-
+*.sqlite3
 
