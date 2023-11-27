@@ -7,9 +7,8 @@ import requests_html
 from urllib.parse import urljoin
 from requests_html import AsyncHTMLSession
 
-confs_path = os.getcwd()[:48] + '\\' + 'data_machine\\configs\\html_tags'
+confs_path = os.getcwd()[:48] + '/' + 'data_machine/configs/html_tags'
 sys.path.append(confs_path)
-
 from scraping_info import books
 
 
@@ -108,16 +107,8 @@ class WebRequestManager:
 
     """
     def __init__(self):
-        """
-        Start a new session each time
-        the object is initialized.
-        """
         self._session = None
-        try: 
-            self._session = requests_html.AsyncHTMLSession()
-        except (Exception, requests_html.exceptions.RequestException) as exception:
-            print(f'Cannot establish connection because {exception}')
-
+    
     async def get_response(self, url: str) -> None:
         """
         Send a request with the url.
@@ -135,12 +126,22 @@ class WebRequestManager:
         task that goes to a list
         of tasks.
         """
+        self.session = requests_html.AsyncHTMLSession()
         for i in range(0, len(urls)):
             task = asyncio.create_task(self.get_response(urls[i]))
             tasks.append(task)
         results = await asyncio.gather(*tasks)
-
+    
         return results
+
+    @property
+    def session(self):
+        return self._session
+    
+    @session.setter
+    def session(self, session):
+        self._session = session
+        
 
 class WebCrawler:
     """
@@ -149,9 +150,8 @@ class WebCrawler:
     site and returns a 
     list of them.
 
-    async def crawl_links(url:str, counter=1):
+    async def extract_links(url:str):
         :url: str
-        :counter: 1, int
         :returns: list[str]
 
     """
@@ -159,27 +159,6 @@ class WebCrawler:
         self.site_dict = site_dict
         self.web_manager = WebRequestManager()
         self.crawled_links = []
-
-    async def crawl_links(self, url, counter=1) -> list[str]:
-        """
-        Go to a particular url
-        and extract all the
-        next page elements
-        using an amount of 
-        them to jump on another.
-        """
-        response = await self.web_manager.get_response(url)
-        next_page_elements = response.html.find(self.site_dict['n_p_element'])
-
-        amount = len(next_page_elements)
-        
-        if amount != 0:
-            for i in range(0, amount):
-                self.crawled_links.append(urljoin(self.site_dict['source'], next_page_elements[i].attrs['href']))
-            counter += amount
-            return await self.crawl_links(f'{self.site_dict["source"]}{self.site_dict["n_p_slug"]}{counter}', counter)
-        else:
-            return self.crawled_links
 
     async def extract_links(self, url: str) -> list[str]:
         """
@@ -223,7 +202,7 @@ class DataFetcher:
         self.crawled_links = []
         
 
-    async def extract_data(self, urls:list[str], list_of_objs=[], local=False) -> list[dict]:
+    async def extract_data(self, urls:list[str], list_of_objs=[]) -> list[dict]:
         """
         Go through each response
         and scrape required data
@@ -247,7 +226,7 @@ class DataFetcher:
 
 
 async def scraping_task():
-    csv = '..\\..\\instant_files\\links.csv'
+    csv = 'links.csv'
     # classes instantiation
     webcrawler = WebCrawler(site_dict=books)
     links_manager = LinksLoadingManager(path_to_csv=csv)
@@ -263,19 +242,26 @@ async def scraping_task():
 
 
 
-    # throwing requests to the server & scraping the HTMLs
-    print('Parsing the data\n')
-    print('initializing the scraper...')
-    data_fetcher = DataFetcher(site_dict=books)
-    time.sleep(2)
-    objects = await data_fetcher.extract_data(urls=links)
-    print('extracting the objects...\n\n\n\n')
-    time.sleep(5)
-    print('THE RESULT IS BELOW\n')
-    try:
-        for i in range(0, len(objects)):
-            for key, value in objects[i].items():
-                print(key + ' ::: ' + str(value))
-            print('\n\n')
-    except IndexError:
-        print('No items found')
+    # # throwing requests to the server & scraping the HTMLs
+    # print('Parsing the data\n')
+    # print('initializing the scraper...')
+    # data_fetcher = DataFetcher(site_dict=books)
+    # time.sleep(2)
+    # objects = await data_fetcher.extract_data(urls=links)
+    # print('extracting the objects...\n\n\n\n')
+    # time.sleep(5)
+    # print('THE RESULT IS BELOW\n')
+    # try:
+    #     for i in range(0, len(objects)):
+    #         for key, value in objects[i].items():
+    #             print(key + ' ::: ' + str(value))
+    #         print('\n\n')
+    # except IndexError:
+    #     print('No items found')
+
+
+
+if __name__ == '__main__':
+    start = time.time()
+    asyncio.run(scraping_task())
+    print(f'Program has done work for {time.time() - start} seconds')
