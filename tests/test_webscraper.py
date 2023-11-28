@@ -3,7 +3,7 @@ import sys
 import asyncio
 import unittest
 
-scraper_path = os.getcwd()[:48] + '\\' + 'data_machine\\managers\\scraping_manager'
+scraper_path = os.getcwd()[:48] + '/' + 'data_machine/managers/scraping_manager'
 sys.path.append(scraper_path)
 
 from engine import (
