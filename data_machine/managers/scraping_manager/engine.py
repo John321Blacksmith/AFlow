@@ -12,6 +12,27 @@ sys.path.append(confs_path)
 from scraping_info import books
 
 
+class TasksManager:
+    """
+    This object manages the task
+    performation.
+    Properties:
+        tasks: list (A collection of the coroutines to be used when ready)
+        requests: list (A collection of requests to be sent to the server)
+    """
+    def __init__(self):
+        self._tasks = None
+        self._requests = None
+    
+    @property
+    def tasks(self):
+        return self._tasks
+    
+    @property
+    def requests(self):
+        return self._requests
+
+
 class LinksLoadingManager:
     """
     The object takes a list of
@@ -34,8 +55,8 @@ class LinksLoadingManager:
     """
     def __init__(self, path_to_csv):
         self.path_to_csv = path_to_csv
+        self._links = []
         
-
     async def save_links(self, parsed_links: list[str]) -> bool:
         """
         Take a list of links and
@@ -50,7 +71,7 @@ class LinksLoadingManager:
         else:
             return True
 
-    async def retrieve_links(self, links=[]) -> list[str]:
+    async def retrieve_links(self) -> list[str]:
         """
         Read the file where the links are
         stored and pull each one out to the list.
@@ -59,11 +80,19 @@ class LinksLoadingManager:
             with open(self.path_to_csv, mode='r') as f:
                 links_frame = pd.read_csv(f, header=None)
                 for i in range(0, len(links_frame[0])):
-                    links.append(links_frame[0][i])
+                    self.links.append(links_frame[0][i])
         except (Exception, FileNotFoundError) as error:
             return None
         else:
-            return links
+            return self.links
+        
+    @property
+    def links(self):
+        return self._links
+    
+    @links.setter
+    async def links(self, links: list[str]):
+        self._links = await self.retrieve_links()
 
     def csv_is_full(self) -> bool:
         """
@@ -107,7 +136,7 @@ class WebRequestManager:
 
     """
     def __init__(self):
-        self._session = None
+        self._session = requests_html.AsyncHTMLSession()
     
     async def get_response(self, url: str) -> None:
         """
@@ -126,22 +155,12 @@ class WebRequestManager:
         task that goes to a list
         of tasks.
         """
-        self.session = requests_html.AsyncHTMLSession()
         for i in range(0, len(urls)):
             task = asyncio.create_task(self.get_response(urls[i]))
             tasks.append(task)
         results = await asyncio.gather(*tasks)
     
         return results
-
-    @property
-    def session(self):
-        return self._session
-    
-    @session.setter
-    def session(self, session):
-        self._session = session
-        
 
 class WebCrawler:
     """
@@ -158,7 +177,7 @@ class WebCrawler:
     def __init__(self, site_dict: dict):
         self.site_dict = site_dict
         self.web_manager = WebRequestManager()
-        self.crawled_links = []
+        self._crawled_links = []
 
     async def extract_links(self, url: str) -> list[str]:
         """
@@ -174,6 +193,10 @@ class WebCrawler:
             return await self.extract_links(url) # recursive case
         else:
             return self.crawled_links # base case
+        
+    @property
+    def crewled_links(self):
+        return self._crawled_links
  
 
 class DataFetcher:
@@ -199,7 +222,7 @@ class DataFetcher:
     def __init__(self, site_dict: dict[dict]):
         self.site_dict = site_dict
         self.web_manager = WebRequestManager()
-        self.crawled_links = []
+        self._crawled_links = []
         
 
     async def extract_data(self, urls:list[str], list_of_objs=[]) -> list[dict]:
@@ -223,8 +246,12 @@ class DataFetcher:
                 list_of_objs.append(obj)
 
         return list_of_objs
-
-
+    
+    @property
+    def crawled_links(self):
+        return self._crawled_links
+    
+    
 async def scraping_task():
     csv = 'links.csv'
     # classes instantiation
